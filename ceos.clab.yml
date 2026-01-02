@@ -1,0 +1,27 @@
+name: ceos
+topology:
+  kinds:
+    arista_ceos:
+      binds:
+        - mymapping.json:/mnt/flash/EosIntfMapping.json:ro
+  nodes:
+    ceos1:
+      kind: arista_ceos
+      image: ceosimage:4.35.1F
+      startup-config: ceos1.conf
+        
+    ceos2:
+      kind: arista_ceos
+      image: ceosimage:4.35.1F
+      startup-config: ceos2.conf
+    ixia-c:
+      kind: keysight_ixia-c-one
+      image: ghcr.io/open-traffic-generator/ixia-c-one:1.42.1-4
+      exec:
+        - "./ifcfg add eth1 10.1.1.2 24"
+        - "./ifcfg add eth2 10.2.2.2 24"
+  links:
+    - endpoints: ["ceos1:eth1", "ceos2:eth1"]
+    - endpoints: ["ceos1:eth2", "ixia-c:eth1"]
+    - endpoints: ["ceos2:eth2", "ixia-c:eth2"]
+
